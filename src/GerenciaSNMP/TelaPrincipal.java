@@ -66,7 +66,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         jLabel8 = new javax.swing.JLabel();
         txtIntevalo = new javax.swing.JTextField();
         jScrollPane3 = new javax.swing.JScrollPane();
-        txtIntefaces = new javax.swing.JTextArea();
+        txtInterfaces = new javax.swing.JTextArea();
         jPanel3 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -180,16 +180,21 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
         jLabel7.setText("Interface:");
 
-        cmbInterfaces.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbInterfaces.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Nenhum" }));
+        cmbInterfaces.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cmbInterfacesItemStateChanged(evt);
+            }
+        });
 
         jLabel8.setText("Intervalo:");
 
-        txtIntefaces.setEditable(false);
-        txtIntefaces.setColumns(20);
-        txtIntefaces.setRows(5);
-        txtIntefaces.setText("Índice, descrição, tipo, speed, MAC, status administrativo e operacional");
-        txtIntefaces.setBorder(javax.swing.BorderFactory.createTitledBorder("Resumo da Interface"));
-        jScrollPane3.setViewportView(txtIntefaces);
+        txtInterfaces.setEditable(false);
+        txtInterfaces.setColumns(20);
+        txtInterfaces.setRows(5);
+        txtInterfaces.setText("Índice, descrição, tipo, speed, MAC, status administrativo e operacional");
+        txtInterfaces.setBorder(javax.swing.BorderFactory.createTitledBorder("Resumo da Interface"));
+        jScrollPane3.setViewportView(txtInterfaces);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -267,51 +272,119 @@ public class TelaPrincipal extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    // Recebimeto de Valores
+    static String ipAddress = "";
+
+    static String port = "";
+
+    static String community = "";
+
+    static int version = 0;
+
+    static int timeout = 0;
+
+    static int retries = 0;
+
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String ipAddress = txtIp.getText();
 
-        String port = txtPorta.getText();
+        // Recebimeto de Valores
+        ipAddress = txtIp.getText();
 
-        String community = txtCommunity.getText();
+        port = txtPorta.getText();
 
-        int version = Integer.parseInt(txtVersao.getText());
+        community = txtCommunity.getText();
 
-        int timeout = Integer.parseInt(txtTimeout.getText());
+        version = Integer.parseInt(txtVersao.getText());
 
-        int retries = Integer.parseInt(txtRetransmissoes.getText());
+        timeout = Integer.parseInt(txtTimeout.getText());
 
+        retries = Integer.parseInt(txtRetransmissoes.getText());
+
+        // Limpando Text Area de Descrição
         txtDescricao.setText("");
+
+        // Buscando os valores do Resumo do Equipamento e Mostrando no Text Area de Descrição
         String[] resumo = {"Descrição: ", "Object ID", "Tempo que está ligado: ", "Contato: ", "Nome: ", "Localização: ", "Services"};
         try {
             for (int i = 1; i < 7; i++) {
                 if (i != 2) {
-                    String oid = ".1.3.6.1.2.1.1." + i + ".0";
-                    String oidResposta = requsicaoSNMP(ipAddress, port, community, version, timeout, retries, oid);
+                    String oidSystem = ".1.3.6.1.2.1.1." + i + ".0";
+                    String oidResposta = requsicaoSNMP(oidSystem);
                     oidResposta = oidResposta.substring(21, (oidResposta.length() - 1));
-                    txtDescricao.append(resumo[i-1] + oidResposta + "\n");
+                    txtDescricao.append(resumo[i - 1] + oidResposta + "\n");
                 }
             }
-
         } catch (Exception ex) {
             Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
+        int ifNumber = 0;
+        // Buscando número de Interfaces
         try {
-            for (int i = 1; i < 7; i++) {
-                if (i != 2) {
-                    String oid = ".1.3.6.1.2.1.2.1.0";
-                    String oidResposta = requsicaoSNMP(ipAddress, port, community, version, timeout, retries, oid);
-                    oidResposta = oidResposta.substring(21, (oidResposta.length() - 1));
-                    txtIntevalo.setText(oidResposta);
-                }
-            }
+            String oidIfNumber = ".1.3.6.1.2.1.2.1.0";
+            String stringIfNumber = requsicaoSNMP(oidIfNumber);
+            ifNumber = Integer.parseInt(stringIfNumber.substring(21, (stringIfNumber.length() - 1)));
 
         } catch (Exception ex) {
             Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
+
+        // Buscando nomes das Interfaces
+        try {
+            for (int i = 1; i <= ifNumber; i++) {
+                String oidIfNumber = ".1.3.6.1.2.1.2.2.1.2." + i;
+                String stringIfNumber = requsicaoSNMP(oidIfNumber);
+                stringIfNumber = stringIfNumber.substring(24 + (Integer.toString(i)).length(), (stringIfNumber.length() - 1));
+                stringIfNumber = stringIfNumber.replace(":", "");
+                String ascii = fromHexString(stringIfNumber);
+                cmbInterfaces.addItem(ascii);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void cmbInterfacesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbInterfacesItemStateChanged
+        // Pegando o índice da interface selecionada
+        int index = cmbInterfaces.getSelectedIndex();
+        
+        // Limpando a Text Area de Interfaces 
+        txtInterfaces.setText("");
+        
+        // Inicializando a matriz
+        String[][] resumo = new String[][]{{"Índice: ", ""}, {"Descrição: ", ""}, {"Tipo: ", ""}, {"MTU: ", ""}, {"Velocidade: ", ""}, {"MAC: ", ""}, {"Admin Status: ", ""}, {"Oper Status: ", ""}};
+
+        // Populando a matriz com os valores
+        try {
+            for (int i = 1; i < 9; i++) {
+                String oidIf = ".1.3.6.1.2.1.2.2.1." + i + "." + index;
+                String oidResposta = requsicaoSNMP(oidIf);
+                resumo[i - 1][1] = oidResposta.substring(24 + (Integer.toString(index)).length(), (oidResposta.length() - 1));
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        //Convertendo valores necessários
+        
+       for(EnumIfType e : EnumIfType.values()){
+       if(resumo[2][1].equals(e.showType()))
+           resumo[2][1] = e.name();
+       }
+        
+        resumo[1][1] = resumo[1][1].replace(":", "");
+        resumo[1][1] = fromHexString(resumo[1][1]);
+        resumo[6][1] = resumo[6][1].equals("1") ? "Up" : "Down";
+        resumo[7][1] = resumo[7][1].equals("1") ? "Up" : "Down";
+        
+        // Inputando na Text Area os valores da matriz
+        for (int i = 0; i < 8; i++) {
+            if (!resumo[i][1].isEmpty())
+                txtInterfaces.append(resumo[i][0] + resumo[i][1] + "\n");
+        }
+    }//GEN-LAST:event_cmbInterfacesItemStateChanged
 
     /**
      * @param args the command line arguments
@@ -349,8 +422,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
     }
 
-    public static String requsicaoSNMP(String ipAddress, String port,
-            String community, int snmpVersion, int timeout, int retries, String oid) throws Exception {
+    public static String requsicaoSNMP(String oid) throws Exception {
         // Create TransportMapping and Listen
         TransportMapping transport = new DefaultUdpTransportMapping();
         Snmp snmp = new Snmp(transport);
@@ -359,7 +431,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         // Create Target Address object
         CommunityTarget comtarget = new CommunityTarget();
         comtarget.setCommunity(new OctetString(community));
-        comtarget.setVersion(snmpVersion);
+        comtarget.setVersion(version);
         comtarget.setAddress(new UdpAddress(ipAddress + "/" + port));
         comtarget.setRetries(retries);
         comtarget.setTimeout(timeout);
@@ -403,6 +475,14 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
     }
 
+    public static String fromHexString(String hex) {
+        StringBuilder str = new StringBuilder();
+        for (int i = 0; i < hex.length(); i += 2) {
+            str.append((char) Integer.parseInt(hex.substring(i, i + 2), 16));
+        }
+        return str.toString();
+    }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> cmbInterfaces;
@@ -422,7 +502,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JPasswordField txtCommunity;
     private javax.swing.JTextArea txtDescricao;
-    private javax.swing.JTextArea txtIntefaces;
+    private javax.swing.JTextArea txtInterfaces;
     private javax.swing.JTextField txtIntevalo;
     private javax.swing.JTextField txtIp;
     private javax.swing.JTextField txtPorta;
