@@ -1,5 +1,7 @@
 package GerenciaSNMP;
 
+import java.awt.EventQueue;
+import static java.lang.Thread.sleep;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.binding.Bindings;
@@ -15,6 +17,9 @@ import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.UdpAddress;
 import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.category.DefaultCategoryDataset;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -64,10 +69,13 @@ public class TelaPrincipal extends javax.swing.JFrame {
         jLabel7 = new javax.swing.JLabel();
         cmbInterfaces = new javax.swing.JComboBox<>();
         jLabel8 = new javax.swing.JLabel();
-        txtIntevalo = new javax.swing.JTextField();
+        txtIntervalo = new javax.swing.JTextField();
         jScrollPane3 = new javax.swing.JScrollPane();
         txtInterfaces = new javax.swing.JTextArea();
         jPanel3 = new javax.swing.JPanel();
+        txtBanda = new javax.swing.JLabel();
+        btnIntervalo = new javax.swing.JButton();
+        jLabel9 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -206,7 +214,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(cmbInterfaces, javax.swing.GroupLayout.PREFERRED_SIZE, 352, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtIntevalo)
+                        .addComponent(txtIntervalo)
                         .addContainerGap())
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel7)
@@ -226,7 +234,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cmbInterfaces, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtIntevalo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtIntervalo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(15, Short.MAX_VALUE))
@@ -234,15 +242,39 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Taxa de Utilização"));
 
+        txtBanda.setText("0");
+
+        btnIntervalo.setText("Ok");
+        btnIntervalo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnIntervaloActionPerformed(evt);
+            }
+        });
+
+        jLabel9.setText("Utilização em Porcentagem");
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel9)
+                .addGap(39, 39, 39)
+                .addComponent(txtBanda)
+                .addGap(42, 42, 42)
+                .addComponent(btnIntervalo)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 140, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnIntervalo)
+                    .addComponent(txtBanda)
+                    .addComponent(jLabel9))
+                .addContainerGap(106, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -266,7 +298,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(57, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -284,6 +316,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
     static int timeout = 0;
 
     static int retries = 0;
+
+    Thread obterOctetos;
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
@@ -349,10 +383,10 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private void cmbInterfacesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbInterfacesItemStateChanged
         // Pegando o índice da interface selecionada
         int index = cmbInterfaces.getSelectedIndex();
-        
+
         // Limpando a Text Area de Interfaces 
         txtInterfaces.setText("");
-        
+
         // Inicializando a matriz
         String[][] resumo = new String[][]{{"Índice: ", ""}, {"Descrição: ", ""}, {"Tipo: ", ""}, {"MTU: ", ""}, {"Velocidade: ", ""}, {"MAC: ", ""}, {"Admin Status: ", ""}, {"Oper Status: ", ""}};
 
@@ -366,25 +400,115 @@ public class TelaPrincipal extends javax.swing.JFrame {
         } catch (Exception ex) {
             Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         //Convertendo valores necessários
-        
-       for(EnumIfType e : EnumIfType.values()){
-       if(resumo[2][1].equals(e.showType()))
-           resumo[2][1] = e.name();
-       }
-        
+        for (EnumIfType e : EnumIfType.values()) {
+            if (resumo[2][1].equals(e.showType())) {
+                resumo[2][1] = e.name();
+            }
+        }
+
         resumo[1][1] = resumo[1][1].replace(":", "");
         resumo[1][1] = fromHexString(resumo[1][1]);
         resumo[6][1] = resumo[6][1].equals("1") ? "Up" : "Down";
         resumo[7][1] = resumo[7][1].equals("1") ? "Up" : "Down";
-        
+
         // Inputando na Text Area os valores da matriz
         for (int i = 0; i < 8; i++) {
-            if (!resumo[i][1].isEmpty())
+            if (!resumo[i][1].isEmpty()) {
                 txtInterfaces.append(resumo[i][0] + resumo[i][1] + "\n");
+            }
         }
     }//GEN-LAST:event_cmbInterfacesItemStateChanged
+
+    private void btnIntervaloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIntervaloActionPerformed
+
+        if (btnIntervalo.getText().equals("Ok")) {
+            btnIntervalo.setText("Parar");
+        } else {
+            btnIntervalo.setText("Ok");
+            obterOctetos.stop();
+            txtIntervalo.setText("0");
+            return;
+        }
+
+        int index = cmbInterfaces.getSelectedIndex();
+
+        obterOctetos = new Thread() {
+            int ifInOctetos_x = 0;
+            int ifOutOctetos_x = 0;
+            int ifInOctetos_y = 0;
+            int ifOutOctetos_y = 0;
+            int diffInOctetos = 0;
+            int diffOutOctetos = 0;
+            double ifSpeed = 0;
+            String oidIfInOctetos = ".1.3.6.1.2.1.2.2.1.10." + index;
+            String oidIfOutOctetos = ".1.3.6.1.2.1.2.2.1.16." + index;
+            String oidResposta = "";
+            int tempo = Integer.parseInt(txtIntervalo.getText());
+            boolean aux = false;
+
+            public void run() {
+                while (Integer.parseInt(txtIntervalo.getText()) != 0) {
+                    EventQueue.invokeLater(new Runnable() {
+                        public void run() {
+                            try {
+
+                                oidResposta = requsicaoSNMP(oidIfInOctetos);
+                                oidResposta = oidResposta.substring(25 + (Integer.toString(index)).length(), (oidResposta.length() - 1));
+                                ifInOctetos_y = Integer.parseInt(oidResposta);
+
+                                oidResposta = requsicaoSNMP(oidIfOutOctetos);
+                                oidResposta = oidResposta.substring(25 + (Integer.toString(index)).length(), (oidResposta.length() - 1));
+                                ifOutOctetos_y = Integer.parseInt(oidResposta);
+
+                                if (aux) {
+                                    diffInOctetos = ifInOctetos_y - ifInOctetos_x;
+                                    diffOutOctetos = ifOutOctetos_y - ifOutOctetos_x;
+                                    int totalBytes = diffInOctetos + diffOutOctetos;
+                                    int totalBytesPorSeg = totalBytes / tempo;
+                                    double totalBitsPorSeg = totalBytesPorSeg * 8;
+                                    double taxaUtilizacao = totalBitsPorSeg / ifSpeed;
+
+                                    System.out.println("ifSpeed: " + ifSpeed);
+                                    System.out.println("Intervalo: " + tempo);
+                                    System.out.println("Total de Bytes: " + totalBytes);
+                                    System.out.println("Total de Bytes por segundo: " + totalBytesPorSeg);
+                                    System.out.println("Total de bits por segundo: " + totalBitsPorSeg);
+                                    System.out.println("Total de Kilobits por segundo: " + totalBitsPorSeg / 1024);
+                                    System.out.println("Taxa de utilização: " + taxaUtilizacao);
+
+                                    txtBanda.setText(Double.toString(taxaUtilizacao * 100) + " %");
+
+//                                    txtBanda.setText(Double.toString(taxaUtilizacao * 100) + " %");
+                                    ifInOctetos_x = ifInOctetos_y;
+                                    ifOutOctetos_x = ifOutOctetos_y;
+
+                                } else {
+                                    ifInOctetos_x = ifInOctetos_y;
+                                    ifOutOctetos_x = ifOutOctetos_y;
+                                    String oidIfSpeed = ".1.3.6.1.2.1.2.2.1.5." + index;
+                                    oidResposta = requsicaoSNMP(oidIfSpeed);
+                                    oidResposta = oidResposta.substring(24 + (Integer.toString(index)).length(), (oidResposta.length() - 1));
+                                    ifSpeed = Integer.parseInt(oidResposta);
+                                    aux = true;
+                                }
+                            } catch (Exception ex) {
+                                Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    });
+                    try {
+                        sleep(tempo * 1000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        };
+
+        obterOctetos.start();
+    }//GEN-LAST:event_btnIntervaloActionPerformed
 
     /**
      * @param args the command line arguments
@@ -485,6 +609,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnIntervalo;
     private javax.swing.JComboBox<String> cmbInterfaces;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
@@ -495,15 +620,17 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JLabel txtBanda;
     private javax.swing.JPasswordField txtCommunity;
     private javax.swing.JTextArea txtDescricao;
     private javax.swing.JTextArea txtInterfaces;
-    private javax.swing.JTextField txtIntevalo;
+    private javax.swing.JTextField txtIntervalo;
     private javax.swing.JTextField txtIp;
     private javax.swing.JTextField txtPorta;
     private javax.swing.JTextField txtRetransmissoes;
