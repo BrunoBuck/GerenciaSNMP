@@ -5,6 +5,7 @@ import static java.lang.Thread.sleep;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.binding.Bindings;
+import javax.swing.JOptionPane;
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
@@ -59,12 +60,12 @@ public class TelaPrincipal extends javax.swing.JFrame {
         txtIp = new javax.swing.JTextField();
         txtPorta = new javax.swing.JTextField();
         txtCommunity = new javax.swing.JPasswordField();
-        txtVersao = new javax.swing.JTextField();
         txtTimeout = new javax.swing.JTextField();
         txtRetransmissoes = new javax.swing.JTextField();
         jScrollPane2 = new javax.swing.JScrollPane();
         txtDescricao = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
+        cbVersion = new javax.swing.JComboBox<>();
         jPanel1 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         cmbInterfaces = new javax.swing.JComboBox<>();
@@ -72,12 +73,13 @@ public class TelaPrincipal extends javax.swing.JFrame {
         txtIntervalo = new javax.swing.JTextField();
         jScrollPane3 = new javax.swing.JScrollPane();
         txtInterfaces = new javax.swing.JTextArea();
+        btnIntervalo = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         txtBanda = new javax.swing.JLabel();
-        btnIntervalo = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados do Equipamento"));
 
@@ -102,8 +104,6 @@ public class TelaPrincipal extends javax.swing.JFrame {
         txtCommunity.setText("abcBolinhas");
         txtCommunity.setName(""); // NOI18N
 
-        txtVersao.setText("1");
-
         txtTimeout.setText("1000");
 
         txtRetransmissoes.setText("2");
@@ -121,6 +121,9 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
+
+        cbVersion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2c" }));
+        cbVersion.setSelectedIndex(1);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -142,11 +145,11 @@ public class TelaPrincipal extends javax.swing.JFrame {
                             .addComponent(txtPorta, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(4, 4, 4)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtCommunity, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3))
+                            .addComponent(jLabel3)
+                            .addComponent(txtCommunity, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(txtVersao, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cbVersion, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel4))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -176,10 +179,10 @@ public class TelaPrincipal extends javax.swing.JFrame {
                     .addComponent(txtIp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtPorta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtCommunity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtVersao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtTimeout, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtRetransmissoes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
+                    .addComponent(jButton1)
+                    .addComponent(cbVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -204,6 +207,14 @@ public class TelaPrincipal extends javax.swing.JFrame {
         txtInterfaces.setBorder(javax.swing.BorderFactory.createTitledBorder("Resumo da Interface"));
         jScrollPane3.setViewportView(txtInterfaces);
 
+        btnIntervalo.setText("Iniciar");
+        btnIntervalo.setEnabled(false);
+        btnIntervalo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnIntervaloActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -211,19 +222,23 @@ public class TelaPrincipal extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(cmbInterfaces, javax.swing.GroupLayout.PREFERRED_SIZE, 352, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtIntervalo)
-                        .addContainerGap())
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel7)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel8)
-                        .addGap(38, 38, 38))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(jScrollPane3)
-                        .addContainerGap())))
+                        .addContainerGap())
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel7)
+                            .addComponent(cmbInterfaces, javax.swing.GroupLayout.PREFERRED_SIZE, 292, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(txtIntervalo, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnIntervalo, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(1, 1, 1))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel8)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -234,7 +249,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cmbInterfaces, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtIntervalo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtIntervalo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnIntervalo))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(15, Short.MAX_VALUE))
@@ -243,13 +259,6 @@ public class TelaPrincipal extends javax.swing.JFrame {
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Taxa de Utilização"));
 
         txtBanda.setText("0");
-
-        btnIntervalo.setText("Ok");
-        btnIntervalo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnIntervaloActionPerformed(evt);
-            }
-        });
 
         jLabel9.setText("Utilização em Porcentagem");
 
@@ -262,8 +271,6 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 .addComponent(jLabel9)
                 .addGap(39, 39, 39)
                 .addComponent(txtBanda)
-                .addGap(42, 42, 42)
-                .addComponent(btnIntervalo)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -271,10 +278,9 @@ public class TelaPrincipal extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnIntervalo)
                     .addComponent(txtBanda)
                     .addComponent(jLabel9))
-                .addContainerGap(106, Short.MAX_VALUE))
+                .addContainerGap(111, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -287,7 +293,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(36, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -321,6 +327,12 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
+        if (txtIp.getText().equals("") || txtPorta.getText().equals("")
+                || txtTimeout.getText().equals("") || txtRetransmissoes.getText().equals("")) {
+            JOptionPane.showMessageDialog(null, "Verifique se todos os campos foram digitados!", "Erro", JOptionPane.OK_CANCEL_OPTION);
+            return;
+        }
+
         // Recebimeto de Valores
         ipAddress = txtIp.getText();
 
@@ -328,7 +340,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
         community = txtCommunity.getText();
 
-        version = Integer.parseInt(txtVersao.getText());
+        version = cbVersion.getSelectedIndex();
 
         timeout = Integer.parseInt(txtTimeout.getText());
 
@@ -349,7 +361,14 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 }
             }
         } catch (Exception ex) {
-            Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+            txtDescricao.setText("Descrição, contato, nome, localização e tempo que está ligado");
+            txtInterfaces.setText("Índice, descrição, tipo, speed, MAC, status administrativo e operacional");
+            txtIntervalo.setText("");
+            txtBanda.setText("0");
+            cmbInterfaces.removeAllItems();
+            cmbInterfaces.addItem("Nenhum");
+            JOptionPane.showMessageDialog(null, "Não houve comunicação com o equipamento informado!", "Erro", JOptionPane.OK_CANCEL_OPTION);
+            return;
         }
 
         int ifNumber = 0;
@@ -377,13 +396,21 @@ public class TelaPrincipal extends javax.swing.JFrame {
             Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void cmbInterfacesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbInterfacesItemStateChanged
         // Pegando o índice da interface selecionada
         int index = cmbInterfaces.getSelectedIndex();
 
+        if (index > 0) {
+            btnIntervalo.setEnabled(true);
+        } else if (index == 0) {
+            btnIntervalo.setEnabled(false);
+            txtInterfaces.setText("Índice, descrição, tipo, speed, MAC, status administrativo e operacional");
+            return;
+        } else {
+            return;
+        }
         // Limpando a Text Area de Interfaces 
         txtInterfaces.setText("");
 
@@ -423,12 +450,14 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
     private void btnIntervaloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIntervaloActionPerformed
 
-        if (btnIntervalo.getText().equals("Ok")) {
+        if (btnIntervalo.getText().equals("Iniciar")) {
             btnIntervalo.setText("Parar");
+            jButton1.setEnabled(false);
         } else {
-            btnIntervalo.setText("Ok");
+            btnIntervalo.setText("Iniciar");
             obterOctetos.stop();
-            txtIntervalo.setText("0");
+            txtBanda.setText("0");
+            jButton1.setEnabled(true);
             return;
         }
 
@@ -439,9 +468,9 @@ public class TelaPrincipal extends javax.swing.JFrame {
             int ifOutOctetos_x = 0;
             int ifInOctetos_y = 0;
             int ifOutOctetos_y = 0;
-            int diffInOctetos = 0;
-            int diffOutOctetos = 0;
-            double ifSpeed = 0;
+            int deltaInOctetos = 0;
+            int deltaOutOctetos = 0;
+            int ifSpeed = 0;
             String oidIfInOctetos = ".1.3.6.1.2.1.2.2.1.10." + index;
             String oidIfOutOctetos = ".1.3.6.1.2.1.2.2.1.16." + index;
             String oidResposta = "";
@@ -454,33 +483,40 @@ public class TelaPrincipal extends javax.swing.JFrame {
                         public void run() {
                             try {
 
+                                System.out.println("In x = " + ifInOctetos_x);
                                 oidResposta = requsicaoSNMP(oidIfInOctetos);
+                                System.out.println("Oid In = " + oidResposta);
                                 oidResposta = oidResposta.substring(25 + (Integer.toString(index)).length(), (oidResposta.length() - 1));
+                                System.out.println("Oid In substring = " + oidResposta);
                                 ifInOctetos_y = Integer.parseInt(oidResposta);
 
+                                System.out.println("Out x = " + ifOutOctetos_x);
                                 oidResposta = requsicaoSNMP(oidIfOutOctetos);
+                                System.out.println("Oid Out = " + oidResposta);
                                 oidResposta = oidResposta.substring(25 + (Integer.toString(index)).length(), (oidResposta.length() - 1));
+                                System.out.println("Oid Out substring = " + oidResposta);
                                 ifOutOctetos_y = Integer.parseInt(oidResposta);
 
                                 if (aux) {
-                                    diffInOctetos = ifInOctetos_y - ifInOctetos_x;
-                                    diffOutOctetos = ifOutOctetos_y - ifOutOctetos_x;
-                                    int totalBytes = diffInOctetos + diffOutOctetos;
-                                    int totalBytesPorSeg = totalBytes / tempo;
+                                    deltaInOctetos = ifInOctetos_y - ifInOctetos_x;
+                                    deltaOutOctetos = ifOutOctetos_y - ifOutOctetos_x;
+                                    int totalBytes = deltaInOctetos + deltaOutOctetos;
+                                    double totalBytesPorSeg = totalBytes / tempo;
                                     double totalBitsPorSeg = totalBytesPorSeg * 8;
-                                    double taxaUtilizacao = totalBitsPorSeg / ifSpeed;
+                                    double taxaUtilizacao = (totalBitsPorSeg / ifSpeed) * 100;
 
                                     System.out.println("ifSpeed: " + ifSpeed);
                                     System.out.println("Intervalo: " + tempo);
+                                    System.out.println("Bytes enviados: " + deltaOutOctetos);
+                                    System.out.println("Bytes recebidos: " + deltaInOctetos);
                                     System.out.println("Total de Bytes: " + totalBytes);
                                     System.out.println("Total de Bytes por segundo: " + totalBytesPorSeg);
                                     System.out.println("Total de bits por segundo: " + totalBitsPorSeg);
                                     System.out.println("Total de Kilobits por segundo: " + totalBitsPorSeg / 1024);
                                     System.out.println("Taxa de utilização: " + taxaUtilizacao);
 
-                                    txtBanda.setText(Double.toString(taxaUtilizacao * 100) + " %");
+                                    txtBanda.setText(taxaUtilizacao + " %");
 
-//                                    txtBanda.setText(Double.toString(taxaUtilizacao * 100) + " %");
                                     ifInOctetos_x = ifInOctetos_y;
                                     ifOutOctetos_x = ifOutOctetos_y;
 
@@ -566,13 +602,10 @@ public class TelaPrincipal extends javax.swing.JFrame {
         pdu.setType(PDU.GET);
         pdu.setRequestID(new Integer32(1));
 
-        // Create Snmp object for sending data to Agent
-        System.out.println("Sending Request to Agent...");
         ResponseEvent response = snmp.get(pdu, comtarget);
 
         // Process Agent Response
         if (response != null) {
-            System.out.println("Got Response from Agent");
             PDU responsePDU = response.getResponse();
 
             if (responsePDU != null) {
@@ -590,6 +623,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
                     System.out.println("Error Status Text = " + errorStatusText);
                 }
             } else {
+
                 System.out.println("Error: Response PDU is null");
             }
         } else {
@@ -610,6 +644,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnIntervalo;
+    private javax.swing.JComboBox<String> cbVersion;
     private javax.swing.JComboBox<String> cmbInterfaces;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
@@ -635,6 +670,5 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JTextField txtPorta;
     private javax.swing.JTextField txtRetransmissoes;
     private javax.swing.JTextField txtTimeout;
-    private javax.swing.JTextField txtVersao;
     // End of variables declaration//GEN-END:variables
 }
