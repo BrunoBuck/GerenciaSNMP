@@ -1,6 +1,10 @@
 package GerenciaSNMP;
 
 import java.awt.EventQueue;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import static java.lang.Thread.sleep;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,7 +23,9 @@ import org.snmp4j.smi.UdpAddress;
 import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 /*
@@ -449,15 +455,36 @@ public class TelaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_cmbInterfacesItemStateChanged
 
     private void btnIntervaloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIntervaloActionPerformed
+        // Criar o dataset para usar no gráfico
+        DefaultCategoryDataset dadosGrafico = new DefaultCategoryDataset();
 
         if (btnIntervalo.getText().equals("Iniciar")) {
             btnIntervalo.setText("Parar");
             jButton1.setEnabled(false);
+
         } else {
             btnIntervalo.setText("Iniciar");
             obterOctetos.stop();
             txtBanda.setText("0");
             jButton1.setEnabled(true);
+
+            // Criar o gráfico
+            JFreeChart grafico = ChartFactory.createLineChart("Meu Grafico", "Dia",
+                    "Valor", dadosGrafico, PlotOrientation.VERTICAL, true, true, false);
+
+            // Escrever o gráfico
+            OutputStream arquivo;
+            try {
+                arquivo = new FileOutputStream("grafico.png");
+                ChartUtilities.writeChartAsPNG(arquivo, grafico, 550, 400);
+                arquivo.close();
+
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
             return;
         }
 
@@ -516,6 +543,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
                                     System.out.println("Taxa de utilização: " + taxaUtilizacao);
 
                                     txtBanda.setText(taxaUtilizacao + " %");
+
+                                    dadosGrafico.addValue(taxaUtilizacao, "maximo", "intervalo 1");
 
                                     ifInOctetos_x = ifInOctetos_y;
                                     ifOutOctetos_x = ifOutOctetos_y;
