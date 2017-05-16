@@ -286,7 +286,6 @@ public class TelaPrincipal extends javax.swing.JFrame {
         jLabel9.setText("Utilização em Porcentagem");
 
         jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel10.setText("(Gráfico)");
         jLabel10.setAlignmentY(0.0F);
         jLabel10.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jLabel10.setName("labelGrafico"); // NOI18N
