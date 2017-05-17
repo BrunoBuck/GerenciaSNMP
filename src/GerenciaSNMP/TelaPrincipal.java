@@ -1,17 +1,24 @@
 package GerenciaSNMP;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import static java.lang.Thread.sleep;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.binding.Bindings;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
@@ -25,6 +32,7 @@ import org.snmp4j.smi.UdpAddress;
 import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
@@ -84,9 +92,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         txtInterfaces = new javax.swing.JTextArea();
         btnIntervalo = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
-        txtBanda = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
+        panelGrafico = new javax.swing.JPanel();
 
         jFrame1.setName("frameGrafico"); // NOI18N
 
@@ -102,7 +108,6 @@ public class TelaPrincipal extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setResizable(false);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados do Equipamento"));
 
@@ -279,16 +284,19 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 .addContainerGap(15, Short.MAX_VALUE))
         );
 
+        jPanel3.setVisible(false);
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Taxa de Utilização"));
 
-        txtBanda.setText("0");
-
-        jLabel9.setText("Utilização em Porcentagem");
-
-        jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel10.setAlignmentY(0.0F);
-        jLabel10.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jLabel10.setName("labelGrafico"); // NOI18N
+        javax.swing.GroupLayout panelGraficoLayout = new javax.swing.GroupLayout(panelGrafico);
+        panelGrafico.setLayout(panelGraficoLayout);
+        panelGraficoLayout.setHorizontalGroup(
+            panelGraficoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        panelGraficoLayout.setVerticalGroup(
+            panelGraficoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 173, Short.MAX_VALUE)
+        );
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -296,29 +304,22 @@ public class TelaPrincipal extends javax.swing.JFrame {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel9)
-                .addGap(39, 39, 39)
-                .addComponent(txtBanda)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(panelGrafico, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtBanda)
-                    .addComponent(jLabel9)))
+                .addContainerGap()
+                .addComponent(panelGrafico, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -333,7 +334,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         pack();
@@ -354,8 +356,10 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
     Thread obterOctetos;
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    JFreeChart grafico;
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        
         if (txtIp.getText().equals("") || txtPorta.getText().equals("")
                 || txtTimeout.getText().equals("") || txtRetransmissoes.getText().equals("")) {
             JOptionPane.showMessageDialog(null, "Verifique se todos os campos foram digitados!", "Erro", JOptionPane.OK_CANCEL_OPTION);
@@ -393,7 +397,6 @@ public class TelaPrincipal extends javax.swing.JFrame {
             txtDescricao.setText("Descrição, contato, nome, localização e tempo que está ligado");
             txtInterfaces.setText("Índice, descrição, tipo, speed, MAC, status administrativo e operacional");
             txtIntervalo.setText("");
-            txtBanda.setText("0");
             cmbInterfaces.removeAllItems();
             cmbInterfaces.addItem("Nenhum");
             JOptionPane.showMessageDialog(null, "Não houve comunicação com o equipamento informado!", "Erro", JOptionPane.OK_CANCEL_OPTION);
@@ -479,46 +482,26 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
     private void btnIntervaloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIntervaloActionPerformed
         // Criar o dataset para usar no gráfico
-        DefaultCategoryDataset dadosGrafico = new DefaultCategoryDataset();
 
         if (btnIntervalo.getText().equals("Iniciar")) {
             btnIntervalo.setText("Parar");
             jButton1.setEnabled(false);
+            jPanel3.setVisible(true);
+            this.pack();
 
         } else {
             btnIntervalo.setText("Iniciar");
             obterOctetos.stop();
-            txtBanda.setText("0");
             jButton1.setEnabled(true);
-
-            // Criar o gráfico
-            JFreeChart grafico = ChartFactory.createLineChart("Dados de utilização", "Intervalo",
-                    "Valor", dadosGrafico, PlotOrientation.VERTICAL, true, true, false);
-
-            // Escrever o gráfico
-            OutputStream arquivo;
-            try {
-                arquivo = new FileOutputStream("grafico.png");
-                ChartUtilities.writeChartAsPNG(arquivo, grafico, 300, 200);
-                arquivo.close();
-
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            ImageIcon icon = new ImageIcon("grafico.png");
-            jLabel10.setIcon(icon);
-            
-            
-
             return;
         }
 
         int index = cmbInterfaces.getSelectedIndex();
 
         obterOctetos = new Thread() {
+            DefaultCategoryDataset dadosGrafico = new DefaultCategoryDataset();
+            Date hora;
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
             int ifInOctetos_x = 0;
             int ifOutOctetos_x = 0;
             int ifInOctetos_y = 0;
@@ -570,9 +553,12 @@ public class TelaPrincipal extends javax.swing.JFrame {
                                     System.out.println("Total de Kilobits por segundo: " + totalBitsPorSeg / 1024);
                                     System.out.println("Taxa de utilização: " + taxaUtilizacao);
 
-                                    txtBanda.setText(taxaUtilizacao + " %");
+                                    hora = Calendar.getInstance().getTime();
+                                    String dataFormatada = sdf.format(hora);
 
-                                    dadosGrafico.addValue(taxaUtilizacao, "maximo", "intervalo 1");
+                                    dadosGrafico.addValue(taxaUtilizacao, "maximo", dataFormatada);
+
+                                    gerarGrafico(dadosGrafico);
 
                                     ifInOctetos_x = ifInOctetos_y;
                                     ifOutOctetos_x = ifOutOctetos_y;
@@ -602,6 +588,20 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
         obterOctetos.start();
     }//GEN-LAST:event_btnIntervaloActionPerformed
+
+    public void gerarGrafico(DefaultCategoryDataset ds) {
+
+        // Criar o gráfico
+        grafico = ChartFactory.createLineChart("", "Intervalo de tempo",
+                "Porcentagem", ds, PlotOrientation.VERTICAL, true, true, false);
+
+        JPanel painel = new ChartPanel(grafico);
+        painel.setPreferredSize(new Dimension(300, 150));
+        painel.setBackground(Color.red);
+        panelGrafico.setLayout(new BorderLayout());
+        panelGrafico.add(painel);
+        panelGrafico.revalidate();
+    }
 
     /**
      * @param args the command line arguments
@@ -706,7 +706,6 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JFrame jFrame1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -714,13 +713,12 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JLabel txtBanda;
+    private javax.swing.JPanel panelGrafico;
     private javax.swing.JPasswordField txtCommunity;
     private javax.swing.JTextArea txtDescricao;
     private javax.swing.JTextArea txtInterfaces;
